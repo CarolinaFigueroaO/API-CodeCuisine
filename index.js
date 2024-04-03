@@ -4,17 +4,21 @@ const mysql = require('mysql2');
 const cors = require('cors');
 const multer = require('multer'); //To handle file uploads
 const port = process.env.PORT || 3001 //Port to be used
-const loginRouter = require('./routes/login');
+const playerLoginRouter = require('./routes/playerLogin');
 const adminRouter = require('./routes/admin');
+const sessionRouter = require('./routes/session');
+const bodyParser = require('body-parser');
 
 const app = express();
 app.use(cors()); //To avoid CORS problems
+app.use(bodyParser.json());
 app.use(multer().array())
 app.use(express.json()); //To parse JSON bodies
 
 
-app.use('/', loginRouter); //Defining the route to the login
+app.use('/', playerLoginRouter); //Defining the route to the login
 app.use('/', adminRouter); //Defining the route to the admin
+app.use('/', sessionRouter); //Defining the route to the session
 
 app.listen(port, () => {
     console.log(`Server started ${port}`);
