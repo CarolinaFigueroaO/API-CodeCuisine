@@ -2,8 +2,12 @@ const pool = require('../helpers/mysql-config'); //Importing the database config
 
 const createSession = async (req, res) => {
     const player_name = req.body.player_name; //Getting the email from the request
-    const date_session = req.body.date_session;
+    
+    const today = new Date();
+    const date_session = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + ' ' + today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
+    
     const getPlayerId = `SELECT id_player FROM playerData WHERE player_name = ?`;
+
     pool.query(getPlayerId, [player_name], (err, results, fields) => { //The callback function is executed when the query is done
         if (err) {
             res.json(err); //If there is an error, we send the error
@@ -17,18 +21,21 @@ const createSession = async (req, res) => {
             res.json(results); //We send the result
         })
     })
+    console.log(date_session);
 }
 
-const sessionsToday = async (req, res) => {
-    const date_session = req.body.date_session;
-    const sql = `SELECT COUNT(*) as count FROM session WHERE date_session = ?`;
-    pool.query(sql, [date_session], (err, results, fields) => { //The callback function is executed when the query is done
-        if (err) {
-            res.json(err); //If there is an error, we send the error
-        }
-        res.json(results[0].count); //We send the result
-    })
+const sessionsByDay = async (req, res) => {
+    const sql = `SELECT DATE(date_session) as day, COUNT(*) as count 
+    FROM session 
+    GROUP BY day`;
 
+
+    pool.query(sql, (err, results, fields) => {
+    if (err) {
+        res.json(err);
+    }
+        res.json(results);
+    });
 }
 
-module.exports = {createSession, sessionsToday}; //Exportamos las funciones
+module.exports = {createSession, sessionsByDay}; //Exportamos las funciones

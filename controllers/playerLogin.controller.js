@@ -45,5 +45,15 @@ const incrementTimePlayed = async (req, res) => {
     })
 }
 
+const getPlayers = async (req, res) => {
+    const sql = `SELECT player_name FROM playerData`;
+    pool.query(sql, (err, results, fields) => {
+        if (err) {
+            res.json(err);
+        }
+        res.json(results);
+    });
+}
 
-module.exports = {doLoginPlayer, createPlayer, incrementTimePlayed}; //Exportamos las funciones
+
+module.exports = {doLoginPlayer, createPlayer, incrementTimePlayed, getPlayers}; //Exportamos las funciones

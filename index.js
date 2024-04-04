@@ -7,6 +7,7 @@ const port = process.env.PORT || 3001 //Port to be used
 const playerLoginRouter = require('./routes/playerLogin');
 const adminRouter = require('./routes/admin');
 const sessionRouter = require('./routes/session');
+const levelProgressRouter = require('./routes/levelProgress');
 const bodyParser = require('body-parser');
 
 const app = express();
@@ -19,6 +20,7 @@ app.use(express.json()); //To parse JSON bodies
 app.use('/', playerLoginRouter); //Defining the route to the login
 app.use('/', adminRouter); //Defining the route to the admin
 app.use('/', sessionRouter); //Defining the route to the session
+app.use('/', levelProgressRouter); //Defining the route to the level progress
 
 app.listen(port, () => {
     console.log(`Server started ${port}`);
