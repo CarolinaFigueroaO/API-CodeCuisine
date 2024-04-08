@@ -47,6 +47,7 @@ const doLoginPlayer = async (req, res) => {
 
 };
 
+//Function to get the accumulated score of a player
 const getTotalScore = async (req, res) => {
     const player_name = req.body.player_name; //Getting the player_name from the request
     console.log(req);   

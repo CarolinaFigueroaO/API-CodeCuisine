@@ -25,6 +25,7 @@ const createLevelProgress = async (req, res) => {
     })
 }
 
+//Count the players that have completed each level
 const playersByLevel = async (req, res) => {
     const sql = `SELECT id_level, COUNT(DISTINCT id_player) AS player_count 
                  FROM levelProgress 
@@ -37,6 +38,7 @@ const playersByLevel = async (req, res) => {
     });
 }
 
+//Count the levels that every player has completed
 const levelsCountPlayer = async (req, res) => {
     const player_name = req.body.player_name;
     const sql = `SELECT COUNT(DISTINCT id_level) AS level_count
