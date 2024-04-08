@@ -15,6 +15,7 @@ const verifyJTW = (req, res, next) => {
             }
             else{
                 //If the token is valid
+                console.log("Token valido"); //Printing "Token valido
                 next();
             }
         });

@@ -4,10 +4,9 @@ const createLevelProgress = async (req, res) => {
     const player_name = req.body.player_name; //Getting the email from the request
     const id_level = req.body.id_level;
     const score = req.body.score;
+    const start_time = req.body.start_time;
+    const finish_time = req.body.finish_time;
 
-    const today = new Date();
-    const date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + ' ' + today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
-    
     const getPlayerId = `SELECT id_player FROM playerData WHERE player_name = ?`;
     
 
@@ -16,13 +15,13 @@ const createLevelProgress = async (req, res) => {
             res.json(err); //If there is an error, we send the error
         }
         const id_player = results[0].id_player;
-        const sql = `INSERT INTO levelProgress (id_player, id_level, score, date_level) VALUES (?, ?, ?, ?)`;
-        pool.query(sql, [id_player, id_level, score, date], (err, results, fields) => { //The callback function is executed when the query is done
+        const sql = `INSERT INTO levelProgress (id_player, id_level, score, start_time, finish_time) VALUES (?, ?, ?, ?, ?)`;
+        pool.query(sql, [id_player, id_level, score, start_time, finish_time], (err, results, fields) => {
             if (err) {
-                res.json(err); //If there is an error, we send the error
+                res.json(err);
             }
-            res.json(results); //We send the result
-        })
+            res.json(results);
+        });
     })
 }
 
