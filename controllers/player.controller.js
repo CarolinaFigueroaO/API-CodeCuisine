@@ -61,6 +61,22 @@ const getTotalScore = async (req, res) => {
 }
 
 
+//Function to get tha accumulated score of all players
+const getLeaderboard = async (req, res) => {
+    const sql = `SELECT pd.player_name, SUM(lp.score) as total_score 
+                 FROM levelProgress lp
+                 INNER JOIN playerData pd ON lp.id_player = pd.id_player
+                 GROUP BY lp.id_player, pd.player_name
+                 ORDER BY total_score DESC`;
+    pool.query(sql, (err, results, fields) => {
+        if (err) {
+            res.json(err);
+        }
+        res.json(results);
+    })
+}
+
+
 const getPlayers = async (req, res) => {
     const sql = `SELECT player_name FROM playerData`;
     pool.query(sql, (err, results, fields) => {
@@ -72,4 +88,4 @@ const getPlayers = async (req, res) => {
 }
 
 
-module.exports = {doLoginPlayer, createPlayer, getPlayers, getTotalScore}; //Exportamos las funciones
+module.exports = {doLoginPlayer, createPlayer, getPlayers, getTotalScore, getLeaderboard}; //Exportamos las funciones
