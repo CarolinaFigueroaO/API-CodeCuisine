@@ -38,5 +38,4 @@ const validateUser = async (req, res) => {
 
 
 
-
 module.exports = {validateUser}; //Exportamos las funciones

@@ -4,4 +4,5 @@ const {validateUser} = require('../controllers/user.controller'); //Calling the 
 
 router.post('/validateUser', validateUser) //Defining the route to validate the user
 
+
 module.exports = router; //Exporting the router

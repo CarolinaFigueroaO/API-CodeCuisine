@@ -28,8 +28,6 @@ const sessionsByDay = async (req, res) => {
     const sql = `SELECT DATE(date_session) as day, COUNT(*) as count 
     FROM session 
     GROUP BY day`;
-
-
     pool.query(sql, (err, results, fields) => {
     if (err) {
         res.json(err);

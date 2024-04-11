@@ -87,5 +87,44 @@ const getPlayers = async (req, res) => {
     });
 }
 
+const timePlayedAll = async (req, res) => {
+    const sql = `SELECT DATE(start_time) as day, SUM(finish_time - start_time) as time_played FROM levelProgress GROUP BY day`;
+    pool.query(sql, (err, results, fields) => {
+        if (err) {
+            throw err;
+        }
+        const timePlayedPerDay = {};
+        results.forEach(row => {
+            const day = new Date(row.day).toLocaleDateString('es-ES'); // Formato de día personalizado
+            const timePlayed = row.time_played / 3600; // Convertir segundos a horas
+            timePlayedPerDay[day] = timePlayed;
+        });
+        res.json(timePlayedPerDay);
+    });
+}   
 
-module.exports = {doLoginPlayer, createPlayer, getPlayers, getTotalScore, getLeaderboard}; //Exportamos las funciones
+
+const countPlayers = async (req, res) => {
+    const sql = `SELECT COUNT(*) as players FROM playerData`;
+    pool.query(sql, (err, results, fields) => {
+        if (err) {
+            res.json(err);
+        }
+        res.json(results);
+    });
+}
+
+
+const countUsers = async (req, res) => {
+    const sql = `SELECT 
+                    (SELECT COUNT(*) FROM playerData WHERE id_user IS NOT NULL) as Users,
+                    (SELECT COUNT(*) FROM playerData WHERE id_user IS NULL) as notUsers`;
+    pool.query(sql, (err, results, fields) => {
+        if (err) {
+            res.json(err);
+        }
+        res.json(results[0]); // Devolvemos el primer resultado ya que ambos resultados estarán en el mismo objeto
+    });
+}
+
+module.exports = {doLoginPlayer, createPlayer, getPlayers, getTotalScore, getLeaderboard, timePlayedAll, countPlayers, countUsers}; //Exportamos las funciones
