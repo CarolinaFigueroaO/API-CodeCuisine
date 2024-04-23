@@ -21,7 +21,6 @@ const createSession = async (req, res) => {
             res.json(results); //We send the result
         })
     })
-    console.log(date_session);
 }
 
 const sessionsByDay = async (req, res) => {
@@ -32,7 +31,15 @@ const sessionsByDay = async (req, res) => {
     if (err) {
         res.json(err);
     }
-        res.json(results);
+    else{
+        const sessionsPerDay = {};
+        results.forEach(row => {
+            const day = new Date(row.day).toLocaleDateString('es-ES');
+            sessionsPerDay[day] = row.count;
+        });
+        result = Object.entries(sessionsPerDay).map(([day, count]) => ({ day, count }));
+        res.json(result);
+    }
     });
 }
 

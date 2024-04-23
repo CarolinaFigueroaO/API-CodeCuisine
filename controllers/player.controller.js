@@ -34,8 +34,8 @@ const doLoginPlayer = async (req, res) => {
         if (err) {
             res.json(err); //If there is an error, we send the error
         }
-        if(results[0].count === 1){ //If the user and password are correct
-            token = jwt.sign({player_name: player_name}, process.env.KEYPHRASE, {expiresIn: 7200}); //We create the token
+        if(results[0] && results[0].count === 1){ //If the user and password are correct
+            token = jwt.sign({player_name: player_name}, process.env.KEYPHRASE, {expiresIn: 172800}); //We create the token
             result = {token: token}; //We create the response
         }
         else{ //If the user and password are incorrect
@@ -63,7 +63,7 @@ const getTotalScore = async (req, res) => {
 
 //Function to get tha accumulated score of all players
 const getLeaderboard = async (req, res) => {
-    const sql = `SELECT pd.player_name, SUM(lp.score) as total_score 
+    const sql = `SELECT pd.id_player, pd.player_name, SUM(lp.score) as total_score 
                  FROM levelProgress lp
                  INNER JOIN playerData pd ON lp.id_player = pd.id_player
                  GROUP BY lp.id_player, pd.player_name
@@ -99,7 +99,8 @@ const timePlayedAll = async (req, res) => {
             const timePlayed = row.time_played / 3600; // Convertir segundos a horas
             timePlayedPerDay[day] = timePlayed;
         });
-        res.json(timePlayedPerDay);
+        result = Object.entries(timePlayedPerDay).map(([day, time_played]) => ({day, time_played}));
+        res.json(result);
     });
 }   
 
@@ -123,8 +124,12 @@ const countUsers = async (req, res) => {
         if (err) {
             res.json(err);
         }
-        res.json(results[0]); // Devolvemos el primer resultado ya que ambos resultados estarán en el mismo objeto
+        result = [{type: "Users", count: results[0].Users}, {type: "notUsers", count: results[0].notUsers}]
+        res.json(result); // Devolvemos el primer resultado ya que ambos resultados estarán en el mismo objeto
     });
 }
+
+
+
 
 module.exports = {doLoginPlayer, createPlayer, getPlayers, getTotalScore, getLeaderboard, timePlayedAll, countPlayers, countUsers}; //Exportamos las funciones

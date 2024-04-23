@@ -14,7 +14,7 @@ const doLoginAdmin = async (req, res) => {
             res.json(err); //If there is an error, we send the error
         }
         if(results[0].count === 1){ //If the user and password are correct
-            token = jwt.sign({email:email}, process.env.KEYPHRASE, {expiresIn: 7200}); //We create the token
+            token = jwt.sign({email:email}, process.env.KEYPHRASE, {expiresIn: 172800}); //We create the token
             result = {token: token, mensaje: 'Correo  y contraseña correctos'} //We create the result
         }
         else{ //If the user and password are incorrect

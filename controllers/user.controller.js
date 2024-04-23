@@ -1,7 +1,7 @@
 const e = require('express');
 const pool = require('../helpers/mysql-config'); //Importing the database configuration
 const jwt = require('jsonwebtoken'); //Importamos la librería de jsonwebtoken
-
+let token = "";
 const validateUser = async (req, res) => {
     const email = req.body.email; //Getting the email from the request
     const sql = `SELECT COUNT(*) as count, user_name FROM userData WHERE email = ?`; //Creating the query
@@ -9,9 +9,10 @@ const validateUser = async (req, res) => {
         if (err) {
             res.json(err); //If there is an error, we send the error
         }
-        if(results[0].count === 1){ //If the user and password are correct
+        if(results[0] && results[0].count === 1){ //If the user and password are correct
             const user_name = results[0].user_name;
-            const token = jwt.sign({user_name: user_name}, process.env.KEYPHRASE, {expiresIn: 7200}); //We create the token
+            console.log(user_name);
+            token = jwt.sign({user_name: user_name}, process.env.KEYPHRASE, {expiresIn: 172800}); //We create the token
             result = {user_name: user_name, token: token}; //We create the result
             res.json(result); //We send the result
             const validatePlayer = `SELECT COUNT(*) as count FROM playerData WHERE id_user = (SELECT id_user FROM userData WHERE email = ?)`;
@@ -25,7 +26,7 @@ const validateUser = async (req, res) => {
                         if (err) {
                             res.json(err); //If there is an error, we send the error
                         }
-                    });
+                    }); 
                 }
             });
         }
