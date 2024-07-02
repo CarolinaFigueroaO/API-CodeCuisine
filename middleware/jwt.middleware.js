@@ -11,16 +11,16 @@ const verifyJTW = (req, res, next) => {
         jwt.verify(token, process.env.KEYPHRASE, (err, decoded) => { //The keyphrase is the secret key
             if(err){
                 //If the token is invalid
-                return res.status(403).json({mensaje: 'Token invalido'});
+                return res.status(403).json({message: 'Token invalido'});
             }
             else{
                 //If the token is valid
-                console.log("Token valido"); //Printing "Token valido
+                console.log("Valid token");
                 next();
             }
         });
     } else{
-        return res.status(401).send({mensaje: 'Token no proporcionado'});
+        return res.status(401).send({message: 'Token not provided'});
     }
 
 }

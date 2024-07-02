@@ -3,24 +3,17 @@ const jwt = require('jsonwebtoken'); //Importamos la librería de jsonwebtoken
 
 const createPlayer = async (req, res) => {
     const player_name = req.body.player_name; //Getting the email from the request
-    const id_user = null;
-    const verifyPlayer = `SELECT COUNT(*) as count FROM playerData WHERE player_name = ?`;
+    let token = "";
+    const verifyPlayer = `CALL createPlayer(?)`; //Query to get the player_id from the player_name
     pool.query(verifyPlayer, [player_name], (err, results, fields) => { //The callback function is executed when the query is done
         if (err) {
             res.json(err); //If there is an error, we send the error
         }
-        if(results[0].count === 0){ //If the user does not exist
-            const sql = `INSERT INTO playerData (player_name, id_user) VALUES (?, ?)`; //Creating the query
-            pool.query(sql, [player_name, id_user], (err, results, fields) => { //The callback function is executed when the query is done
-                if (err) {
-                    res.json(err); //If there is an error, we send the error
-                }
-                res.json({message: "Player created"}); //We send the result
-            });
+        if(results[0][0].message == "Player created"){ //If the user and password are correct
+            token = jwt.sign({player_name: player_name}, process.env.KEYPHRASE, {expiresIn: 7200}); //We create the token
         }
-        else{ //If the user exists
-            res.json({message: "Player already exists"}); //We send the result
-        }
+        result = {token: token}; //We create the response
+        res.json(result); //We send the result
     });
 }
 
@@ -35,7 +28,7 @@ const doLoginPlayer = async (req, res) => {
             res.json(err); //If there is an error, we send the error
         }
         if(results[0] && results[0].count === 1){ //If the user and password are correct
-            token = jwt.sign({player_name: player_name}, process.env.KEYPHRASE, {expiresIn: 172800}); //We create the token
+            token = jwt.sign({player_name: player_name}, process.env.KEYPHRASE, {expiresIn: 7200}); //We create the token
             result = {token: token}; //We create the response
         }
         else{ //If the user and password are incorrect
@@ -61,20 +54,31 @@ const getTotalScore = async (req, res) => {
 }
 
 
-//Function to get tha accumulated score of all players
 const getLeaderboard = async (req, res) => {
-    const sql = `SELECT pd.id_player, pd.player_name, SUM(lp.score) as total_score 
+    const sql = `SELECT pd.id_player, pd.player_name, pd.id_user, SUM(lp.score) as total_score 
                  FROM levelProgress lp
                  INNER JOIN playerData pd ON lp.id_player = pd.id_player
                  GROUP BY lp.id_player, pd.player_name
                  ORDER BY total_score DESC`;
+
     pool.query(sql, (err, results, fields) => {
         if (err) {
             res.json(err);
+            return;
         }
-        res.json(results);
-    })
+
+        // Iterate over the results and create a new array with the data we want to return
+        const leaderboard = results.map(row => {
+            const { id_user, ...rest } = row; // Remove the id_user from the row
+            const isUser = row.id_user !== null;
+            return { ...rest, isUser };
+        });
+
+        res.json(leaderboard);
+    });
 }
+
+
 
 
 const getPlayers = async (req, res) => {
